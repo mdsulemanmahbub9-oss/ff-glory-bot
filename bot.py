@@ -3,8 +3,9 @@ from discord.ext import commands
 import requests
 from flask import Flask
 from threading import Thread
+import os
 
-# এই অংশটি বটকে Render-এ ২৪ ঘণ্টা অনলাইনে রাখতে সাহায্য করবে
+# Render এ ২৪ ঘণ্টা সচল রাখার জন্য Flask Web Server
 app = Flask('')
 @app.route('/')
 def home():
@@ -17,7 +18,7 @@ def keep_alive():
     t = Thread(target=run)
     t.start()
 
-# আপনার ডিসকর্ড বট টোকেন (নিচে দেওয়া হলো)
+# আপনার নতুন টোকেনটি এখানে বসান (একক উদ্ধৃতি চিহ্নের ভেতরে)
 TOKEN = 'UGgs-HfMWR0DSALO63G19jGjY4SiWIYk'
 
 intents = discord.Intents.default()
@@ -32,11 +33,20 @@ async def on_ready():
 async def check(ctx, player_id: str):
     await ctx.send(f"⏳ আইডি `{player_id}` এর তথ্য খোঁজা হচ্ছে...")
     try:
-        # ফ্রি ফায়ার তথ্য পাওয়ার জন্য API
         api_url = f"https://free-fire-api-five.vercel.app/api/freefire?id={player_id}"
-        response = requests.get(api_url)
-        data = response.json()
+        data = requests.get(api_url).json()
         
         if "name" in data:
-            embed = discord.Embed(title="🎮 Free Fire Player Stats", color=discord.Color.blue())
-            embed.add_field(name="Name", value=data.get("name"), inline=True)
+            embed = discord.Embed(title="🎮 প্লেয়ার প্রোফাইল তথ্য", color=discord.Color.blue())
+            embed.add_field(name="নাম", value=data.get("name"), inline=True)
+            embed.add_field(name="লেভেল", value=data.get("level"), inline=True)
+            embed.add_field(name="গিল্ড", value=data.get("guildName", "নেই"), inline=False)
+            embed.set_footer(text="তৈরি করেছেন: Suleman")
+            await ctx.send(embed=embed)
+        else:
+            await ctx.send("❌ এই আইডি দিয়ে কোনো প্লেয়ার পাওয়া যায়নি।")
+    except Exception as e:
+        await ctx.send(f"⚠️ ত্রুটি হয়েছে: {e}")
+
+keep_alive()
+bot.run(TOKEN)
