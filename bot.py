@@ -18,7 +18,7 @@ def keep_alive():
     t.start()
 
 # আপনার ডিসকর্ড বট টোকেন (নিচে দেওয়া হলো)
-TOKEN = 'VeD9TUwrs6HAlSgR7ydfeAr0EVpyCJmm'
+TOKEN = 'UGgs-HfMWR0DSALO63G19jGjY4SiWIYk'
 
 intents = discord.Intents.default()
 intents.message_content = True
